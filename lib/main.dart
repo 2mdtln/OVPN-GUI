@@ -4,14 +4,10 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
-
-  WindowOptions windowOptions = const WindowOptions(
+  const windowOptions = WindowOptions(
     title: "openvpn gui - Mamy",
-    size: Size(400, 500),
-    center: true,
-    skipTaskbar: false,
+    size: Size(500, 250),
   );
-
   await windowManager.waitUntilReadyToShow(windowOptions);
   windowManager.show();
   runApp(const MyApp());
@@ -19,12 +15,12 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
+      theme: ThemeData.dark(),
+      home: const Scaffold(
         body: Center(child: Text('Hello, World!')),
       ),
     );
