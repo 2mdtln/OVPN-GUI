@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:window_manager/window_manager.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -36,6 +37,42 @@ class MyHomePage extends StatefulWidget {
   createState() => _MyHomePageState();
 }
 
+class CloudPainter extends CustomPainter {
+  final bool show;
+  CloudPainter({required this.show});
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (!show) return;
+    final paint = Paint()
+      ..color = Colors.black.withOpacity(0.8)
+      ..style = PaintingStyle.fill;
+    final path = Path()
+      ..moveTo(0, 20)
+      ..lineTo(20, 0)
+      ..lineTo(size.width - 20, 0)
+      ..lineTo(size.width, 20)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+    final textPainter = TextPainter(
+      text: const TextSpan(
+        text: 'Copied!',
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    )..layout();
+    textPainter.paint(
+        canvas,
+        Offset((size.width - textPainter.width) / 2,
+            (size.height - textPainter.height) / 2));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => show;
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   String _ipAddress = 'XXX.XXX.XXX.XXX';
   Process? _vpnProcess;
@@ -44,6 +81,22 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void _handleDroppedFiles(files) {
+    if (files.isNotEmpty) {
+      for (var file in files) {
+        if (file.path.endsWith('.ovpn')) {
+          _handleConnection(file.path);
+          debugPrint(file.path);
+          break;
+        } else {
+          const SnackBar(content: Text('Not a .ovpn file'));
+        }
+      }
+    } else {
+      const SnackBar(content: Text('No files dropped'));
+    }
   }
 
   Future<void> _handleConnection(String filepath) async {
@@ -103,7 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
       var ipMatch = regexInet.firstMatch(output);
       if (ipMatch != null && _activeTun != 'No active TUN') {
         var ipAddress = ipMatch.group(1) ?? 'IP address not found';
-        debugPrint('IP address found: $ipAddress');
         setState(() {
           _ipAddress = ipAddress;
         });
@@ -119,17 +171,40 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _showPopup(BuildContext context) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 150,
+        left: 210,
+        child: Material(
+          color: Colors.transparent,
+          child: CustomPaint(
+            size: const Size(60, 30),
+            painter: CloudPainter(show: true),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 1), () {
+      overlayEntry.remove();
+    });
+  }
+
   Future<void> _disconnect() async {
     try {
       if (_vpnProcess != null) {
         _vpnProcess!.kill();
-        setState(() {
-          _vpnProcess = null;
-          _activeTun = 'No active TUN';
-          _ipAddress = 'Disconnected';
-        });
-        debugPrint('Disconnected');
+        const SnackBar(content: Text('Disconnected'));
       }
+      setState(() {
+        _vpnProcess = null;
+        _activeTun = 'No active TUN';
+        _ipAddress = 'Disconnected';
+      });
     } catch (e) {
       debugPrint('Error disconnecting: $e');
     }
@@ -161,9 +236,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                'IP Address: $_ipAddress ($_activeTun)',
-                style: Theme.of(context).textTheme.bodyMedium,
+              GestureDetector(
+                onTap: () {
+                  if (_vpnProcess != null) {
+                    Clipboard.setData(ClipboardData(text: _ipAddress));
+                    _showPopup(context);
+                  }
+                },
+                child: Text(
+                  'IP Address: $_ipAddress ($_activeTun)',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -175,21 +258,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-
-  void _handleDroppedFiles(files) {
-    if (files.isNotEmpty) {
-      for (var file in files) {
-        if (file.path.endsWith('.ovpn')) {
-          _handleConnection(file.path);
-          debugPrint(file.path);
-          break;
-        } else {
-          debugPrint('Not a .ovpn file');
-        }
-      }
-    } else {
-      debugPrint('No files dropped');
-    }
   }
 }
