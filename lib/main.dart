@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:window_manager/window_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -76,11 +77,25 @@ class CloudPainter extends CustomPainter {
 class _MyHomePageState extends State<MyHomePage> {
   String _ipAddress = 'XXX.XXX.XXX.XXX';
   Process? _vpnProcess;
+  String? _lastUsedConfigFile;
   String _activeTun = 'No active TUN';
 
   @override
   void initState() {
     super.initState();
+    _loadLastUsedConfigFile();
+  }
+
+  Future<void> _loadLastUsedConfigFile() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _lastUsedConfigFile = prefs.getString('lastUsedConfigFile');
+    });
+  }
+
+  Future<void> _saveLastUsedConfigFile(String filepath) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('lastUsedConfigFile', filepath);
   }
 
   void _handleDroppedFiles(files) {
@@ -102,6 +117,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _handleConnection(String filepath) async {
     try {
       debugPrint('Starting VPN connection with file: $filepath');
+      _lastUsedConfigFile = filepath;
+      await _saveLastUsedConfigFile(filepath);
       _vpnProcess = await Process.start("openvpn",
           ["--config", filepath, "--verb", "3", "--suppress-timestamps"]);
       setState(() {
@@ -110,7 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       String result = '';
       _vpnProcess?.stdout.transform(utf8.decoder).listen((data) {
-        //debugPrint('OpenVPNN: $data');
         result += data;
       });
       await Future.delayed(const Duration(seconds: 5));
@@ -139,6 +155,14 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _ipAddress = 'Connection error';
       });
+    }
+  }
+
+  Future<void> _connectToLastFile() async {
+    if (_lastUsedConfigFile != null) {
+      await _handleConnection(_lastUsedConfigFile!);
+    } else {
+      const SnackBar(content: Text('No last used .ovpn file found'));
     }
   }
 
@@ -217,8 +241,6 @@ class _MyHomePageState extends State<MyHomePage> {
         onDragDone: (details) {
           _handleDroppedFiles(details.files);
         },
-        //onDragEntered: (details) => debugPrint('Drag entered'),
-        //onDragExited: (details) => debugPrint('Drag exited'),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -252,6 +274,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton(
                 onPressed: _disconnect,
                 child: const Text('Disconnect'),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _connectToLastFile,
+                child: Text(_lastUsedConfigFile != null
+                    ? 'Connect to last .ovpn: ${_lastUsedConfigFile!.split('/').last}'
+                    : 'Connect to last .ovpn'),
               ),
             ],
           ),
