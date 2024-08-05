@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:process_run/shell_run.dart';
+import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,16 +57,28 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-  void _handleDroppedFiles(files) {
-    if (files.isNotEmpty) {
-      for (var file in files) {
-        if (file.path.endsWith('.ovpn')) {
-          debugPrint('Dropped .ovpn file: ${file.path}');
-        } else {
-          debugPrint('Dropped file is not a .ovpn file: ${file.path}');
-        }
+void _handleDroppedFiles(files) {
+  if (files.isNotEmpty) {
+    for (var file in files) {
+      if (file.path.endsWith('.ovpn')) {
+        _handleConnection(file.path);
+        debugPrint(file.path);
+        break;
+      } else {
+        debugPrint('Not a .ovpn file');
       }
-    } else {
-      debugPrint('No files dropped');
     }
+  } else {
+    debugPrint('No files dropped');
   }
+}
+
+_handleConnection(String filepath) async {
+  try {
+    var shell = Shell();
+    shell.runExecutableArguments("openvpn", [filepath]);
+    debugPrint(shell.toString());
+  } catch (e) {
+    debugPrint('Error: $e');
+  }
+}
