@@ -57,13 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       String result = '';
       _vpnProcess?.stdout.transform(utf8.decoder).listen((data) {
-        debugPrint('OpenVPNN: $data');
+        //debugPrint('OpenVPNN: $data');
         result += data;
       });
       await Future.delayed(const Duration(seconds: 5));
-      debugPrint(result);
       if (result == '') {
-        debugPrint('OpenVPN result is null.');
         setState(() {
           _ipAddress = 'Connection failed';
         });
@@ -73,21 +71,18 @@ class _MyHomePageState extends State<MyHomePage> {
       var match = regexTun.firstMatch(result);
       if (match != null) {
         var activeTun = match.group(1) ?? 'No active TUN';
-        debugPrint('TUN interface found: $activeTun');
         setState(() {
           _activeTun = activeTun;
           _ipAddress = 'Fetching IP address...';
         });
         await _fetchIpAddress();
       } else {
-        debugPrint('No TUN interface found.');
         setState(() {
           _activeTun = 'No active TUN';
           _ipAddress = 'TUN interface not found';
         });
       }
     } catch (e) {
-      debugPrint('Error in _handleConnection: $e');
       setState(() {
         _ipAddress = 'Connection error';
       });
@@ -96,39 +91,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _fetchIpAddress() async {
     try {
-      debugPrint('Fetching IP address...');
-
-      var result = await Process.run('ip', ['addr']);
-
+      var result = await Process.run('ip', ['addr', 'show', _activeTun]);
       if (result.exitCode != 0) {
-        debugPrint('Error running ip command. Exit code: ${result.exitCode}');
         setState(() {
           _ipAddress = 'Error running ip command';
         });
         return;
       }
-
       var output = result.stdout as String;
-      debugPrint('IP command output: $output');
-
       var regexInet = RegExp(r'inet (\d+\.\d+\.\d+\.\d+)');
       var ipMatch = regexInet.firstMatch(output);
-
       if (ipMatch != null && _activeTun != 'No active TUN') {
         var ipAddress = ipMatch.group(1) ?? 'IP address not found';
         debugPrint('IP address found: $ipAddress');
-
         setState(() {
           _ipAddress = ipAddress;
         });
       } else {
-        debugPrint('No IP address found or no active TUN.');
         setState(() {
           _ipAddress = 'IP address not found';
         });
       }
     } catch (e) {
-      debugPrint('Error in _fetchIpAddress: $e');
       setState(() {
         _ipAddress = 'Error fetching IP address';
       });
