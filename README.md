@@ -52,8 +52,12 @@ How to Contribute
 
 
 4. Push to the branch:
-
 `git push origin feature/NewFeature`
 
 
 5. Open a pull request.
+
+---
+
+### 📜 License
+This project is licensed under the [GPL-3.0 License](LICENSE).
