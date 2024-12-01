@@ -1,8 +1,9 @@
 # OpenVPN GUI Client
 
+A simple and user-friendly GUI for managing OpenVPN connections.
+
 ![gif](assets/dem.gif)
 
-A simple and user-friendly GUI for managing OpenVPN connections.
 This project was developed in a short amount of time, so it’s not perfect. I welcome all [contributions](#-Contributing) to help improve it!
 
 ---
