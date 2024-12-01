@@ -1,6 +1,7 @@
 # OpenVPN GUI Client
 A simple and user-friendly GUI for managing OpenVPN connections.
 
+This project was developed in a short amount of time, so it’s not perfect. I welcome all [contributions](#🤝-Contributing) to help improve it!
 ---
 
 ## 🚀 Features
@@ -19,8 +20,6 @@ A simple and user-friendly GUI for managing OpenVPN connections.
 I built this tool as a fun personal project to streamline my workflow while solving CTF challenges. While it's not intended for professional use, I hope it might also be helpful to others.
 
 
----
-
 Feel free to star ⭐ the repo if you find it useful!
 
 ---
@@ -32,7 +31,7 @@ soon
 
 ---
 
-🤝 Contributing
+### 🤝 Contributing
 
 Contributions are welcome!
 Whether it's fixing bugs, suggesting features, or improving the documentation, I'd love your input. This is my first open-source project, and I'm excited to collaborate and learn with the community.
@@ -58,8 +57,3 @@ How to Contribute
 
 
 5. Open a pull request.
-
-
-
-> Contributions for Windows and macOS builds are especially appreciated!
-
