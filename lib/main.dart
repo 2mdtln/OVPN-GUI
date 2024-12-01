@@ -38,9 +38,9 @@ class MyHomePage extends StatefulWidget {
   createState() => _MyHomePageState();
 }
 
-class CloudPainter extends CustomPainter {
+class Cloud extends CustomPainter {
   final bool show;
-  CloudPainter({required this.show});
+  Cloud({required this.show});
   @override
   void paint(Canvas canvas, Size size) {
     if (!show) return;
@@ -205,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.transparent,
           child: CustomPaint(
             size: const Size(60, 30),
-            painter: CloudPainter(show: true),
+            painter: Cloud(show: true),
           ),
         ),
       ),
