@@ -41,9 +41,9 @@ Before installing the application, ensure the following dependencies are install
 
 Run the following command to install them:
 
-`sudo apt-get update`
+`sudo apt update`
 
-`sudo apt-get install -y libgtk-3-dev openvpn`
+`sudo apt install -y libgtk-3-dev openvpn`
 
 
 2. Download the .deb package
