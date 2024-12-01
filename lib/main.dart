@@ -103,7 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
       for (var file in files) {
         if (file.path.endsWith('.ovpn')) {
           _handleConnection(file.path);
-          debugPrint(file.path);
           break;
         } else {
           const SnackBar(content: Text('Not a .ovpn file'));
@@ -116,7 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _handleConnection(String filepath) async {
     try {
-      debugPrint('Starting VPN connection with file: $filepath');
       _lastUsedConfigFile = filepath;
       await _saveLastUsedConfigFile(filepath);
       _vpnProcess = await Process.start("openvpn",
