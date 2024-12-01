@@ -33,11 +33,24 @@ Feel free to star ⭐ the repo if you find it useful!
 
 To install the OpenVPN GUI Client on your Linux system, follow these steps:
 
-1. Download the .deb package
+
+1. ⚙️ Install required dependencies 
+
+Before installing the application, ensure the following dependencies are installed:
+`libgtk-3-dev`, `openvpn`
+
+Run the following command to install them:
+
+`sudo apt-get update`
+
+`sudo apt-get install -y libgtk-3-dev openvpn`
+
+
+2. Download the .deb package
 
 Download the latest version of the `.deb` package from [releases](https://github.com/2mdtln/OVPN-GUI/releases). The file name will be `ovpngui-1.0.0+1.0.0-linux.deb`.
 
-2. Install the package
+3. Install the package
 
 Open a terminal and run the following command to install the .deb package:
 
@@ -48,7 +61,7 @@ If you encounter any dependency issues, run the following command to resolve the
 
 `sudo apt install -f`
 
-3. Launch the application
+4. Launch the application
 
 After installation, you can launch the GUI with the following command:
 
