@@ -1,0 +1,33 @@
+display_name: OVPN GUI
+package_name: ovpngui
+
+maintainer:
+  name: Mamy(2mdtln)
+  email: 2mdtln@gmail.com
+
+priority: optional
+
+section: x11
+
+installed_size: 15700
+
+dependencies:
+  - openvpn
+
+essential: false
+
+icon: assets/icon.png
+
+postuninstall_scripts:
+  - echo "Sorry to see you go."
+
+keywords:
+  - VPN
+  - Open VPN
+
+generic_name: OVPN GUI
+
+categories:
+  - Utility
+
+startup_notify: true
