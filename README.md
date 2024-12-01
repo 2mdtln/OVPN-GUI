@@ -35,7 +35,7 @@ To install the OpenVPN GUI Client on your Linux system, follow these steps:
 
 1. Download the .deb package
 
-Download the latest version of the `.deb` package from [Releases](/releases). The file name will be `ovpngui-1.0.0+1.0.0-linux.deb`.
+Download the latest version of the `.deb` package from [releases](https://github.com/2mdtln/OVPN-GUI/releases). The file name will be `ovpngui-1.0.0+1.0.0-linux.deb`.
 
 2. Install the package
 
